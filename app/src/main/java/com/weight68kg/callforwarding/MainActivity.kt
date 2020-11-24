@@ -4,78 +4,75 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import com.tbruyelle.rxpermissions3.RxPermissions
+import com.tbruyelle.rxpermissions2.RxPermissions
+import com.weight68kg.callforwarding.R
 import kotlinx.android.synthetic.main.activity_main.*
 
-
 class MainActivity : AppCompatActivity() {
-    val rxPermissions = RxPermissions(this);
-    var line1Number = ""
+
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val systemService = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+
+        val rxPermissions = RxPermissions(this)
+        val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         rxPermissions.request(
-            Manifest.permission.READ_SMS,
-            Manifest.permission.READ_PHONE_NUMBERS,
-            Manifest.permission.READ_PHONE_STATE
-        )
-            .subscribe { granted ->
-                if (granted) { //
-                    line1Number = systemService.line1Number
-                } else {
-
-                }
+                Manifest.permission.READ_SMS,
+                Manifest.permission.READ_PHONE_NUMBERS,
+                Manifest.permission.READ_PHONE_STATE
+        ).subscribe({
+            if (it) {
+                phone.setText("${telephonyManager.line1Number}")
+            } else {
+                Toast.makeText(this, "没有权限获取当前手机手机号", Toast.LENGTH_SHORT).show()
             }
+        })
 
 
-        tv_call.setOnClickListener {
-            val intent = Intent(Intent.ACTION_CALL)
-            val data: Uri = Uri.parse("tel:${et.text}")
-            intent.data = data
-            startActivity(intent)
+        call.setOnClickListener {
+            rxPermissions.request(Manifest.permission.CALL_PHONE)
+                    .subscribe {
+                        if (it) {
+//                            val uri = Uri.parse("tel:%23%2367%23")
+                            val uri = Uri.parse("tel:**67*${et_call_phone.text}%23")
+                            val intent = Intent(Intent.ACTION_CALL, uri)
+                            startActivity(intent)
 
-        }
 
-        tv_call1.setOnClickListener {
-
-
-            rxPermissions
-                .request(Manifest.permission.CALL_PHONE)
-                .subscribe { granted ->
-                    if (granted) { // Always true pre-M
-                        // I can control the camera now
-                        val phoneUri = Uri.parse("tel:**67*${et.text}%23")
-                        val intent = Intent(Intent.ACTION_CALL, phoneUri)
-                        startActivity(intent)
-
-                        val handler = Handler(mainLooper)
-                        handler.postDelayed({
-                            val intent2 = Intent(Intent.ACTION_CALL)
-                            val data: Uri = Uri.parse("tel:${line1Number}")
-                            intent2.data = data
-                            startActivity(intent2)
-                        }, 2000)
-                    } else {
-                        // Oups permission denied
+                            val handler = Handler(mainLooper)
+                            handler.postDelayed({
+                                val uri2 = Uri.parse("tel:${phone.text}")
+                                val intent2 = Intent(Intent.ACTION_CALL, uri2)
+                                startActivity(intent2)
+                            }, 3000)
+                        } else {
+                            Toast.makeText(this, "没有权限获拨打手机", Toast.LENGTH_SHORT).show()
+                        }
                     }
-
-                }
-
-
         }
+
+
+
+
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        val handler = Handler(mainLooper)
+        handler.postDelayed({
+            val intent1 = Intent(Intent.ACTION_CALL, Uri.parse("tel:%23%2367%23"))
+            startActivity(intent1)
+        }, 700)
+
+    }
 
 }

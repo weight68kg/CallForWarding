@@ -7,22 +7,39 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/et"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="当前手机号："
+            android:textSize="20sp" />
+
+        <EditText
+            android:hint="未获取手机号"
+            android:id="@+id/phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+
+    <EditText
+        android:id="@+id/et_call_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="拨打的手机号"
+        android:inputType="phone"
+        android:textSize="30sp" />
 
     <Button
-        android:id="@+id/tv_call"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/tv_call1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:id="@+id/call"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="拨打" />
+
+
 </LinearLayout>
